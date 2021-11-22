@@ -1,6 +1,6 @@
 # PLUMERIA
 
-August 2021 - cloned November 2021 for solo work
+August 2021 - cloned November 2021 for continuing solo work
 
 Original project hosted at: https://plumeria.herokuapp.com/
 
