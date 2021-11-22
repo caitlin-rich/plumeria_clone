@@ -1,3 +1,5 @@
+////IMPORTS////
+
 import React from "react";
 import { connect } from "react-redux";
 import { authenticate } from "../store";
@@ -15,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-// COMPONENT
+////STYLING////
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -37,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+////COMPONENT////
 
 const AuthForm = props => {
   const { name, displayName, handleSubmit, error } = props;

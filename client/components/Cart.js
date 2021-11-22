@@ -1,3 +1,5 @@
+////IMPORTS////
+
 import React, { useState } from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -17,8 +19,9 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Box, Button, Typography } from "@material-ui/core";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-
 import { me } from "../store";
+
+////STYLING////
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -38,9 +41,10 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
+////COMPONENT////
+
 function Cart(props) {
   const [value, setValue] = useState(1);
-  //setValue(value + 1)  <--- use to re-render
 
   const [selectedQuantity, setSelectedQuantity] = useState([1]);
 
@@ -60,6 +64,7 @@ function Cart(props) {
     setValue(value + 1);
   }
 
+  //BUG FIX NEEDED HERE
   //handleSubmit WORKS in that it hits the PUT route, but it's giving me a 401 Unauthorized error.
 
   return (
@@ -111,6 +116,7 @@ function Cart(props) {
                             {info.quantity}
                           </StyledTableCell>
                           <StyledTableCell align="right">
+                            {/* BUG FIX NEEDED HERE - drops trailing zero on price */}
                             ${(info.price * info.quantity) / 100} @ $
                             {info.price / 100} per unit
                           </StyledTableCell>
@@ -162,7 +168,7 @@ function Cart(props) {
               : "Cart Cannot Be Found."}
           </Table>
         </TableContainer>
-        <Typography>Total: $0.00 (placeholder - dev will fix soon!)</Typography>
+        <Typography>Total Placeholder: $0.00</Typography>
         <Button href="/payment">Checkout</Button>
       </div>
     </Box>
@@ -197,27 +203,3 @@ const mapDispatch = dispatch => {
 };
 
 export default withRouter(connect(mapState, mapDispatch)(Cart));
-
-//GET TOTAL FUNCTION CODE For my reference:
-// let total = 0;
-
-// props.cart.OrderDetails.map(detail => {
-//   let flower = props.flowers.filter(
-//     flower => flower.id === detail.flowerId
-//   );
-
-//   let quantity = detail.quantity;
-//   let flowerPrice = flower.map(i => i.price)
-
-//   let subTotal = quantity * flowerPrice
-//   total += subTotal
-//   })
-
-//     let dividedTotal = total / 100;
-
-//     let decimalTotal = dividedTotal.toLocaleString("en-us", {
-//       style: "currency",
-//       currency: "USD",
-//     });
-
-//     return decimalTotal;

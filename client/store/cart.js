@@ -125,6 +125,8 @@ export const fetchUpdateFlower = (token, OrderDetail, quantity ) => { //same her
 };
 
 
+//BUG FIX NEEDED HERE - why isn't this letting the cart change without refreshing? 
+
 //this is now going to be state.cart 
 export default function cartReducer(state = {}, action) { 
   switch (action.type) {
