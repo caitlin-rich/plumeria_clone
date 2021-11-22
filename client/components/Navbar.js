@@ -12,8 +12,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import MuiAppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-// import plumera_text_only_logo.png from '../images/plumera_text_only_logo.png'
-//const logo = require('../images/plumera_text_only_logo.png');
+
 
 function AppBar(props) {
   return <MuiAppBar elevation={0} position="static" {...props} />;
@@ -79,7 +78,7 @@ class Navbar extends React.Component {
                   >
                      <img
                       src="images/plumera_text_only_logo.png"
-                      alt="plumeria_logo"
+                      alt="plumeria"
 
                     />
                   </Button>

@@ -1,7 +1,8 @@
 # PLUMERIA
 
-August 2021
-Grace Shopper project for Team 4, cohort 2106.
+August 2021 - cloned November 2021 for solo work
+
+Original project hosted at: https://plumeria.herokuapp.com/
 
 ## Team Members
 

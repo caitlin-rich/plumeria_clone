@@ -97,25 +97,6 @@ function Cart(props) {
                   ));
 
                   return (
-                    // <tr key={detail.id}>
-                    //   <td>
-                    //     {flower.map(info => (
-                    //       <img className="orderImage" src={info.image} />
-                    //     ))}
-                    //   </td>
-                    //   <td> {flower.map(info => info.name)}</td>
-                    //   <td>{quantity}</td>
-                    //   <td>
-                    //     ${flower.map(info => info.price * info.quantity) / 100} @
-                    //     {flower.map(info => info.price / 100)} per unit
-                    //   </td>
-                    //   <td>
-                    //
-                    //   </td>
-                    //   <td>
-                    //     <button onClick={(e, token = (window.localStorage.token), orderDetailId = orderDetail) => handleSubmitDelete(e, token, orderDetailId)}> Delete Flower</button>
-                    //   </td>
-                    // </tr>
 
                     <TableBody>
                       {flower.map(info => (
@@ -181,7 +162,7 @@ function Cart(props) {
               : "Cart Cannot Be Found."}
           </Table>
         </TableContainer>
-        <Typography>Total: $0.00 (placeholder)</Typography>
+        <Typography>Total: $0.00 (placeholder - dev will fix soon!)</Typography>
         <Button href="/payment">Checkout</Button>
       </div>
     </Box>
