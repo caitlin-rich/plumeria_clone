@@ -77,7 +77,7 @@ class Navbar extends React.Component {
                     href="/"
                   >
                      <img
-                      src="images/plumera_text_only_logo.png"
+                      src="/images/plumera_text_only_logo.png"
                       alt="plumeria"
 
                     />

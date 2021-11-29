@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import {
-  fetchCart,
+  // fetchCart,
   removeItemFromCart,
   fetchUpdateFlower,
 } from "../store/cart";
-import { fetchFlowers } from "../store/allFlowers";
+// import { fetchFlowers } from "../store/allFlowers";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -52,6 +52,8 @@ function Cart(props) {
     setSelectedQuantity(e.target.value);
   }
 
+  //BUG FIX: as of 11/29/21 the update quantity button is not working. 
+
   function handleSubmitQuantity(e, token, orderDetailId, quant) {
     e.preventDefault();
     props.updateItem(token, orderDetailId, quant);
@@ -75,11 +77,11 @@ function Cart(props) {
             <TableHead>
               <TableRow>
                 <StyledTableCell></StyledTableCell>
-                <StyledTableCell align="right">Flower Name</StyledTableCell>
-                <StyledTableCell align="right">Quantity</StyledTableCell>
-                <StyledTableCell align="right">Price</StyledTableCell>
-                <StyledTableCell align="right">Edit</StyledTableCell>
-                <StyledTableCell align="right">Remove Item</StyledTableCell>
+                <StyledTableCell align="center">Flower Name</StyledTableCell>
+                <StyledTableCell align="center">Quantity</StyledTableCell>
+                <StyledTableCell align="center">Price</StyledTableCell>
+                <StyledTableCell align="center">Edit</StyledTableCell>
+                <StyledTableCell align="center">Remove Item</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -101,25 +103,35 @@ function Cart(props) {
                     <option value={num}>{num}</option>
                   ));
 
+                  //getting total 
+                  //Plan: loop through, using similar code to the quantityArr loop, and then add up total that way. can probably use .reduce?
+
                   return (
 
                     <TableBody>
                       {flower.map(info => (
+                        
+                        
                         <StyledTableRow key={info.name}>
+                          {console.log(info)}
                           <StyledTableCell component="th" scope="row">
                             <Link to={`/flowers/${info.id}`}><img className="orderImage" src={info.image} /></Link>
                           </StyledTableCell>
+
                           <StyledTableCell align="right">
                           <Link to={`/flowers/${info.id}`}>{info.name}</Link>
                           </StyledTableCell>
+
+                          {/* BUG FIX: This is showing the full quantity and not the user selected quantity from the cart.  */}
                           <StyledTableCell align="right">
                             {info.quantity}
                           </StyledTableCell>
+
                           <StyledTableCell align="right">
-                            {/* BUG FIX NEEDED HERE - drops trailing zero on price */}
-                            ${(info.price * info.quantity) / 100} @ $
-                            {info.price / 100} per unit
+                            ${((info.price * info.quantity)/ 100).toFixed(2)} @ $
+                            {(info.price / 100)} per unit
                           </StyledTableCell>
+
                           <StyledTableCell align="right">
                             <div>
                               <select
@@ -149,6 +161,7 @@ function Cart(props) {
                               </Button>
                             </div>
                           </StyledTableCell>
+
                           <StyledTableCell align="right">
                             <Button
                               onClick={(
@@ -160,6 +173,7 @@ function Cart(props) {
                               <DeleteForeverIcon />
                             </Button>
                           </StyledTableCell>
+
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -184,12 +198,13 @@ const mapState = state => {
 
 const mapDispatch = dispatch => {
   return {
-    getCart: id => {
-      dispatch(fetchCart(id));
-    },
-    getFlowers: () => {
-      dispatch(fetchFlowers());
-    },
+    //11/29/21 - I don't need these! We're getting the cart via state. We don't actually call these at any point. 
+    // getCart: id => {
+    //   dispatch(fetchCart(id));
+    // },
+    // getFlowers: () => {
+    //   dispatch(fetchFlowers());
+    // },
     loadInitialData() {
       dispatch(me());
     },
