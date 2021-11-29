@@ -4,9 +4,9 @@ import axios from "axios";
 const SET_CART = "SET_CART";
 const SET_CART_ID = "SET_CART_ID";
 const REMOVE_ITEM = "REMOVE_ITEM";
-const ADD_CART = "ADD_CART"
-const ADD_TO_ORDER = "ADD_TO_ORDER" 
-const UPDATE_FLOWER = "UPDATE_FLOWER" 
+const ADD_CART = "ADD_CART";
+const ADD_TO_ORDER = "ADD_TO_ORDER";
+const UPDATE_FLOWER = "UPDATE_FLOWER";
 
 //action creator
 
@@ -14,7 +14,6 @@ export const setCart = order => {
   return {
     type: SET_CART,
     order,
-    
   };
 };
 
@@ -22,44 +21,44 @@ export const setCartId = order => {
   return {
     type: SET_CART,
     order,
-    
   };
 };
-
 
 export const removeItem = orderDetailId => {
   return {
     type: REMOVE_ITEM,
-    orderDetailId
+    orderDetailId,
   };
 };
 
-export const addCart = (order) => {
+export const addCart = order => {
   return {
     type: ADD_CART,
-    order
+    order,
   };
 };
 
-export const addToOrder = (orderDetail) => {
+export const addToOrder = orderDetail => {
   return {
     type: ADD_TO_ORDER,
-    orderDetail
+    orderDetail,
   };
 };
 
-export const updateFlower = (orderDetail) => {
+export const updateFlower = orderDetail => {
   return {
     type: UPDATE_FLOWER,
-    orderDetail
+    orderDetail,
   };
 };
 
 //thunk
-export const fetchCart = token => { 
+export const fetchCart = token => {
   return async dispatch => {
     try {
-      const { data } = await axios.get(`/api/cart`, {headers: { Authorization: token }});
+      const { data } = await axios.get(`/api/cart`, {
+        headers: { Authorization: token },
+      });
       dispatch(setCart(data));
     } catch (err) {
       console.log(err);
@@ -67,10 +66,9 @@ export const fetchCart = token => {
   };
 };
 
-export const fetchCartId = (id) => { 
+export const fetchCartId = id => {
   return async dispatch => {
     try {
-
       const { data } = await axios.get(`/api/cart/${id}`);
       dispatch(setCart(data));
     } catch (err) {
@@ -79,11 +77,12 @@ export const fetchCartId = (id) => {
   };
 };
 
-export const removeItemFromCart = (token, orderDetailId) => { 
-
+export const removeItemFromCart = (token, orderDetailId) => {
   return async dispatch => {
     try {
-      const { data } = await axios.delete(`/api/cart/${orderDetailId}`, {headers: { Authorization: token }});
+      const { data } = await axios.delete(`/api/cart/${orderDetailId}`, {
+        headers: { Authorization: token },
+      });
       dispatch(removeItem(data));
     } catch (err) {
       console.log(err);
@@ -91,10 +90,14 @@ export const removeItemFromCart = (token, orderDetailId) => {
   };
 };
 
-export const fetchAddCart = (token, flowerId, quantity) => { 
+export const fetchAddCart = (token, flowerId, quantity) => {
   return async dispatch => {
     try {
-      const { data } = await axios.post(`/api/cart/${flowerId}/${quantity}`,null, {headers: { Authorization: token }});
+      const { data } = await axios.post(
+        `/api/cart/${flowerId}/${quantity}`,
+        null,
+        { headers: { Authorization: token } }
+      );
       dispatch(addCart(data));
     } catch (err) {
       console.log(err);
@@ -102,10 +105,14 @@ export const fetchAddCart = (token, flowerId, quantity) => {
   };
 };
 
-export const fetchAddToOrder = (token, OrderId, flowerId, quantity) => { 
+export const fetchAddToOrder = (token, OrderId, flowerId, quantity) => {
   return async dispatch => {
     try {
-      const { data } = await axios.post(`/api/cart/${OrderId}/${flowerId}/${quantity}`, null , {headers: { Authorization: token }});
+      const { data } = await axios.post(
+        `/api/cart/${OrderId}/${flowerId}/${quantity}`,
+        null,
+        { headers: { Authorization: token } }
+      );
       dispatch(addToOrder(data));
     } catch (err) {
       console.log(err);
@@ -113,10 +120,15 @@ export const fetchAddToOrder = (token, OrderId, flowerId, quantity) => {
   };
 };
 
-export const fetchUpdateFlower = (token, OrderDetail, quantity ) => { //same here
+export const fetchUpdateFlower = (token, OrderDetail, quantity) => {
+  //same here
   return async dispatch => {
     try {
-      const { data } = await axios.put(`/api/cart/${OrderDetail}/${quantity}`, null, {headers: { Authorization: token }});
+      const { data } = await axios.put(
+        `/api/cart/${OrderDetail}/${quantity}`,
+        null,
+        { headers: { Authorization: token } }
+      );
       dispatch(updateFlower(data));
     } catch (err) {
       console.log(err);
@@ -124,39 +136,38 @@ export const fetchUpdateFlower = (token, OrderDetail, quantity ) => { //same her
   };
 };
 
+//BUG FIX NEEDED HERE - why isn't this letting the cart change without refreshing?
 
-//BUG FIX NEEDED HERE - why isn't this letting the cart change without refreshing? 
-
-//this is now going to be state.cart 
-export default function cartReducer(state = {}, action) { 
+//this is now going to be state.cart
+export default function cartReducer(state = {}, action) {
   switch (action.type) {
-
-
-    case SET_CART: 
+    case SET_CART:
       return action.order;
-      case SET_CART_ID: 
+    case SET_CART_ID:
       return action.order;
     case REMOVE_ITEM:
-      return state.filter((orderDetailId) => orderDetailId.id !== action.orderDetailId.id )
-      //bug here is 'state.filter is not a function' 
+      return state.OrderDetails.filter(
+        orderDetailId => orderDetailId.id !== action.orderDetailId.id
+      );
+    //Unsure if there is still a bug here or if the issue has moved over to the Cart component! 
     case ADD_CART:
-      return action.order
-    case ADD_TO_ORDER: 
-      return {...state, OrderDetails: [...state.OrderDetails, action.orderDetail]} 
-    case UPDATE_FLOWER: 
+      return action.order;
+    case ADD_TO_ORDER:
       return {
-        ...state, OrderDetails : state.OrderDetails.map((eachOrder) => {
+        ...state,
+        OrderDetails: [...state.OrderDetails, action.orderDetail],
+      };
+    case UPDATE_FLOWER:
+      return {
+        ...state,
+        OrderDetails: state.OrderDetails.map(eachOrder => {
           if (eachOrder.id === action.orderDetail.id) {
-            eachOrder.quantity = action.orderDetail.quantity 
-          } return eachOrder
-        })
-     }
-        default:
-          return state;
-    }
+            eachOrder.quantity = action.orderDetail.quantity;
+          }
+          return eachOrder;
+        }),
+      };
+    default:
+      return state;
   }
-
-
-
-
-  
+}

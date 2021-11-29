@@ -4,11 +4,9 @@ import React, { useState } from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import {
-  // fetchCart,
   removeItemFromCart,
   fetchUpdateFlower,
 } from "../store/cart";
-// import { fetchFlowers } from "../store/allFlowers";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -44,15 +42,13 @@ const StyledTableRow = withStyles(theme => ({
 ////COMPONENT////
 
 function Cart(props) {
-  const [value, setValue] = useState(1);
 
+  const [value, setValue] = useState(1);
   const [selectedQuantity, setSelectedQuantity] = useState([1]);
 
   function handleChange(e) {
     setSelectedQuantity(e.target.value);
   }
-
-  //BUG FIX: as of 11/29/21 the update quantity button is not working because the quantity shown is the total quantity, not the amount the user put in the cart. 
 
   function handleSubmitQuantity(e, token, orderDetailId, quant) {
     e.preventDefault();
@@ -60,13 +56,13 @@ function Cart(props) {
     setValue(value + 1);
   }
 
+
+  //BUG FIX: 11/29/21 we have a new and exciting DELETE error. Now the cart is showing it doesn't exist (aka props.cart.id is returning False) after we hit the delete icon. It shows up correctly after refreshing though!
   function handleSubmitDelete(e, token, orderDetailId) {
     e.preventDefault();
     props.removeItem(token, orderDetailId);
     setValue(value + 1);
   }
-
-  //BUG FIX: handleSubmit WORKS in that it hits the PUT route, but it's giving me a 401 Unauthorized error.
 
   return (
     <Box m={50}>
@@ -121,7 +117,6 @@ function Cart(props) {
                           <Link to={`/flowers/${info.id}`}>{info.name}</Link>
                           </StyledTableCell>
 
-                          {/* BUG FIX: This is showing the full quantity and not the user selected quantity from the cart.  */}
                           <StyledTableCell align="right">
                             {quantity}
                           </StyledTableCell>
@@ -197,13 +192,7 @@ const mapState = state => {
 
 const mapDispatch = dispatch => {
   return {
-    //11/29/21 - I don't need these! We're getting the cart via state. We don't actually call these at any point. 
-    // getCart: id => {
-    //   dispatch(fetchCart(id));
-    // },
-    // getFlowers: () => {
-    //   dispatch(fetchFlowers());
-    // },
+
     loadInitialData() {
       dispatch(me());
     },
