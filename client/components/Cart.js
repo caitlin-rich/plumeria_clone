@@ -52,7 +52,7 @@ function Cart(props) {
     setSelectedQuantity(e.target.value);
   }
 
-  //BUG FIX: as of 11/29/21 the update quantity button is not working. 
+  //BUG FIX: as of 11/29/21 the update quantity button is not working because the quantity shown is the total quantity, not the amount the user put in the cart. 
 
   function handleSubmitQuantity(e, token, orderDetailId, quant) {
     e.preventDefault();
@@ -66,8 +66,7 @@ function Cart(props) {
     setValue(value + 1);
   }
 
-  //BUG FIX NEEDED HERE
-  //handleSubmit WORKS in that it hits the PUT route, but it's giving me a 401 Unauthorized error.
+  //BUG FIX: handleSubmit WORKS in that it hits the PUT route, but it's giving me a 401 Unauthorized error.
 
   return (
     <Box m={50}>
@@ -90,6 +89,7 @@ function Cart(props) {
                   let flower = props.flowers.filter(
                     flower => flower.id === detail.flowerId
                   );
+                  console.log(props.cart.OrderDetails)
                   let quantity = detail.quantity;
                   let orderDetail = detail.id;
 
@@ -113,7 +113,6 @@ function Cart(props) {
                         
                         
                         <StyledTableRow key={info.name}>
-                          {console.log(info)}
                           <StyledTableCell component="th" scope="row">
                             <Link to={`/flowers/${info.id}`}><img className="orderImage" src={info.image} /></Link>
                           </StyledTableCell>
@@ -124,11 +123,11 @@ function Cart(props) {
 
                           {/* BUG FIX: This is showing the full quantity and not the user selected quantity from the cart.  */}
                           <StyledTableCell align="right">
-                            {info.quantity}
+                            {quantity}
                           </StyledTableCell>
 
                           <StyledTableCell align="right">
-                            ${((info.price * info.quantity)/ 100).toFixed(2)} @ $
+                            ${((info.price * quantity)/ 100).toFixed(2)} @ $
                             {(info.price / 100)} per unit
                           </StyledTableCell>
 
