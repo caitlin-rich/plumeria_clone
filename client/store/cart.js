@@ -138,15 +138,16 @@ export default function cartReducer(state = {}, action) {
       return action.order;
     case REMOVE_ITEM:
       return state.filter((orderDetailId) => orderDetailId.id !== action.orderDetailId.id )
+      //bug here is 'state.filter is not a function' 
     case ADD_CART:
       return action.order
     case ADD_TO_ORDER: 
       return {...state, OrderDetails: [...state.OrderDetails, action.orderDetail]} 
     case UPDATE_FLOWER: 
       return {
-        ...state, OrderDetails : OrderDetails.map((eachOrder) => {
+        ...state, OrderDetails : state.OrderDetails.map((eachOrder) => {
           if (eachOrder.id === action.orderDetail.id) {
-            eachOrder.quantity = action.orderDetail.quantity //or we can make it = action.orderDetail?
+            eachOrder.quantity = action.orderDetail.quantity 
           } return eachOrder
         })
      }
