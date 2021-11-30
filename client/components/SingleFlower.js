@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { fetchSingleFlower } from "../store/singleFlower";
@@ -38,63 +38,70 @@ const styles = theme => ({
   },
 });
 
-export class SingleFlower extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedQuantity: 0,
-      addedToCartMessage: "",
-    };
-  }
-  componentDidMount() {
-    this.props.getFlower(this.props.match.params.id);
-    this.props.getCart(window.localStorage.token);
-  }
-  handleChange(event) {
-    this.setState({
-      selectedQuantity: event.target.value,
-    });
-  }
-  ///////////////////////////////START OF HANDLE SUBMIT////////////////////////////////////
-  handleSubmit(event) {
-    event.preventDefault();
-    if (this.props.isLoggedIn) {
-      // ----------------- logged in code below  --------
-      const cart = this.props.cart || 0;
-      //const orderId = this.props.cart.id;
-      const token = window.localStorage.token;
-      const flowerId = parseInt(this.props.match.params.id);
-      const quantity = parseInt(this.state.selectedQuantity);
+function SingleFlower(props) {
+  const [selectedQuantity, setSelectedQuantity] = useState(0);
+  const [addedToCartMessage, setAddedToCartMessage] = useState("");
 
-      if (this.state.selectedQuantity === 0) {
-        this.setState({
-          addedToCartMessage: "Please select a quantity to add.",
-        });
+  const {
+    isLoggedIn,
+    flower,
+    cart,
+    getFlower,
+    getCart,
+    addCart,
+    updateFlowerQuantity,
+    addToOrder,
+    match,
+  } = props;
+
+  const token = window.localStorage.token;
+  const flowerId = parseInt(match.params.id);
+
+  //BUG FIX: this had been on componentDidMount, but now that this is function the useEffect hook SHOULD in theory be doing the same thing, but i am definitely getting this running continuously. it's not impeding actual function, but it still shouldn't be happening.
+  useEffect(() => getFlower(flowerId));
+  const { name, image, price, description, quantity } = flower;
+
+  //uses a for loop to put 1 through total quantity into quantity selection dropdown
+  let quantityArr = [];
+  for (let i = 0; i <= quantity; i++) {
+    quantityArr.push(i);
+  }
+  let renderQuant = quantityArr.map(num => <option key={num}>{num}</option>);
+
+  function handleChange(event) {
+    setSelectedQuantity(event.target.value);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (isLoggedIn) {
+      if (selectedQuantity === 0) {
+        setAddedToCartMessage("Please choose a quantity.");
         return;
       }
 
-      //find if flowerid is in flowerid of order detail
-      if (cart !== 0) {
-        const OrderDetail = this.props.cart.OrderDetails.filter(element => {
-          element.flowerId === flowerId;
-        }); // orderDetailArr will hold the matched flower in cart otherwise return 0
-        if (OrderDetail.length > 0) {
-          // && orderDetail not 0 aka UpdateOldFlower
-          this.props.updateFlowerQuantity(token, OrderDetail[0].id, quantity);
+      //uses flowerId to determine if flower is already in cart
+      if (cart) {
+        const orderDetail = cart.OrderDetails.filter(
+          element => (element.flowerId = flowerId)
+        );
+
+        //BUG FIX: need to set it up so we can't add more flowers than we have in stock
+
+        if (orderDetail.length > 0) {
+          updateFlowerQuantity(token, orderDetail[0].id, selectedQuantity);
+          setAddedToCartMessage("Flower(s) added to cart!");
         } else {
-          //if only cart !==0 aka cart exists aka addNewFlower
-          this.props.addToOrder(token, cart.id, flowerId, quantity);
-          this.setState({ addedToCartMessage: "Flower(s) added to cart!" });
+          addToOrder(token, cart.id, flowerId, selectedQuantity);
+          setAddedToCartMessage("Flower(s) added to cart!");
         }
       } else {
-        //else if cart===0 aka cart not exists
-        this.props.addCart(token, flowerId, quantity);
-      } // -----------logged in code above --------------g
+        addCart(token, flowerId, selectedQuantity);
+      }
     } else {
-      //if a user is not logged in; guest cart;
-      this.setState({ addedToCartMessage: "" });
-      const { id, name, image, price } = this.props.flower;
-      const quantity = this.state.selectedQuantity;
+      ////GUEST CART////;
+      setAddedToCartMessage("");
+      //do i need this setAddedToCart here?
       const cartInLocalStorage = localStorage.getItem("cart");
       const items = (() => {
         return cartInLocalStorage === null
@@ -102,7 +109,7 @@ export class SingleFlower extends React.Component {
           : JSON.parse(cartInLocalStorage);
       })();
       const addItems = (() => {
-        if (quantity === 0) {
+        if (selectedQuantity === 0) {
           this.setState({
             addedToCartMessage: "Please select a quantity to add.",
           });
@@ -110,77 +117,71 @@ export class SingleFlower extends React.Component {
         }
         for (let i = 0; i < items.length; i++) {
           let existingId = items[i].id;
-          if (existingId === id) {
+          if (existingId === flowerId) {
             let pastQuantity = items[i].quantity;
             if (
               parseInt(quantity) >
-              parseInt(this.props.flower.quantity) - parseInt(pastQuantity)
+              parseInt(flower.quantity) - parseInt(pastQuantity)
             ) {
-              this.setState({
-                addedToCartMessage: `Low Stock: Please add ${
-                  parseInt(this.props.flower.quantity) - parseInt(pastQuantity)
-                } or fewer.`,
-              });
+              setAddedToCartMessage(
+                `Low Stock: Please add ${
+                  parseInt(flower.quantity) - parseInt(pastQuantity)
+                } or fewer.`
+              );
+
               return;
             }
             items.splice(i, 1);
             items.push({
-              id: id,
+              id: flowerId,
               image: image,
               name: name,
               price: price,
               quantity: parseInt(quantity) + parseInt(pastQuantity),
-              totalStock: parseInt(this.props.flower.quantity),
+              totalStock: parseInt(flower.quantity),
             });
-            this.setState({ addedToCartMessage: "Flower quantity updated!" });
+            setAddedToCartMessage("Flower quantity updated!");
             return;
           }
         }
         items.push({
-          id: id,
+          id: flowerId,
           image: image,
           name: name,
           price: price,
           quantity: quantity,
-          totalStock: parseInt(this.props.flower.quantity),
+          totalStock: parseInt(flower.quantity),
         });
-        this.setState({ addedToCartMessage: "Flower(s) added to cart!" });
+        setAddedToCartMessage("Flower(s) added to cart!");
       })();
       localStorage.setItem("cart", JSON.stringify(items));
     }
   }
-  ///////////////////END OF HANDLESUBMIT/////////////////////////////////////////
-  render() {
-    const { name, image, price, description, quantity } = this.props.flower;
-    let quantityArr = [];
-    for (let i = 0; i <= quantity; i++) {
-      quantityArr.push(i);
-    }
-    let renderQuant = quantityArr.map(num => <option key={num}>{num}</option>);
-    return (
-      <Box m={50} justify="center" alignItems="center">
-        <Card className={styles.title}>
-          <Button>{name}</Button>
-          <CardMedia component="img" height="400" image={image} title={name} />
-          <Typography>${price / 100}</Typography>
-          <h3>{description}</h3>
-          <div id="quantitySelect">
-            Quantity:
-            <select
-              name="selectedQuantity"
-              value={this.state.selectedQuantity}
-              onChange={e => this.handleChange(e)}
-            >
-              {renderQuant}
-            </select>
-          </div>
-          <Button onClick={e => this.handleSubmit(e)}>Add To Cart</Button>
-          <Typography>{this.state.addedToCartMessage}</Typography>
-        </Card>
-      </Box>
-    );
-  }
+
+  return (
+    <Box m={50} justify="center" alignItems="center">
+      <Card className={styles.title}>
+        <Button>{name}</Button>
+        <CardMedia component="img" height="400" image={image} title={name} />
+        <Typography>${price / 100}</Typography>
+        <h3>{description}</h3>
+        <div id="quantitySelect">
+          Quantity:
+          <select
+            name="selectedQuantity"
+            value={selectedQuantity}
+            onChange={e => handleChange(e)}
+          >
+            {renderQuant}
+          </select>
+        </div>
+        <Button onClick={e => handleSubmit(e)}>Add To Cart</Button>
+        <Typography>{addedToCartMessage}</Typography>
+      </Card>
+    </Box>
+  );
 }
+
 const mapState = state => {
   return {
     auth: state.auth,

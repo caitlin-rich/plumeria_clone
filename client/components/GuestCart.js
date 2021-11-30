@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+//BUG FIX LET'S GET SOME MATERIAL UI IN HERE
+
 export function GuestCart(props) {
   let guestCart = JSON.parse(localStorage.getItem("cart"));
 
