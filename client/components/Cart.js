@@ -41,9 +41,10 @@ const StyledTableRow = withStyles(theme => ({
 
 ////COMPONENT////
 
-function Cart(props) {
+function Cart({flowers, cart, updateItem, removeItem}) {
 
-  const [value, setValue] = useState(1);
+  console.log(cart)
+
   const [selectedQuantity, setSelectedQuantity] = useState([1]);
 
   function handleChange(e) {
@@ -52,16 +53,13 @@ function Cart(props) {
 
   function handleSubmitQuantity(e, token, orderDetailId, quant) {
     e.preventDefault();
-    props.updateItem(token, orderDetailId, quant);
-    setValue(value + 1);
+    updateItem(token, orderDetailId, quant);
   }
 
-
-  //BUG FIX: 11/29/21 we have a new and exciting DELETE error. Now the cart is showing it doesn't exist (aka props.cart.id is returning False) after we hit the delete icon. It shows up correctly after refreshing though!
+  //BUG FIX: 11/29/21 we have a new and exciting DELETE error. Now the cart is showing it doesn't exist (aka cart.id is returning False) after we hit the delete icon. It shows up correctly after refreshing though!
   function handleSubmitDelete(e, token, orderDetailId) {
     e.preventDefault();
-    props.removeItem(token, orderDetailId);
-    setValue(value + 1);
+    removeItem(token, orderDetailId);
   }
 
   return (
@@ -80,12 +78,11 @@ function Cart(props) {
               </TableRow>
             </TableHead>
 
-            {props.cart.id
-              ? props.cart.OrderDetails.map(detail => {
-                  let flower = props.flowers.filter(
+            {cart.id
+              ? cart.OrderDetails.map(detail => {
+                  let flower = flowers.filter(
                     flower => flower.id === detail.flowerId
                   );
-                  console.log(props.cart.OrderDetails)
                   let quantity = detail.quantity;
                   let orderDetail = detail.id;
 
@@ -94,6 +91,9 @@ function Cart(props) {
                   for (let i = 1; i <= flower.map(i => i.quantity); i++) {
                     quantityArr.push(i);
                   }
+
+                //  let quantityArr = flower.map(i => i.quantity)
+                 //can we make this immutable? likely yes!
 
                   let renderQuant = quantityArr.map(num => (
                     <option value={num}>{num}</option>
@@ -113,20 +113,20 @@ function Cart(props) {
                             <Link to={`/flowers/${info.id}`}><img className="orderImage" src={info.image} /></Link>
                           </StyledTableCell>
 
-                          <StyledTableCell align="right">
+                          <StyledTableCell align="center">
                           <Link to={`/flowers/${info.id}`}>{info.name}</Link>
                           </StyledTableCell>
 
-                          <StyledTableCell align="right">
+                          <StyledTableCell align="center">
                             {quantity}
                           </StyledTableCell>
 
-                          <StyledTableCell align="right">
+                          <StyledTableCell align="center">
                             ${((info.price * quantity)/ 100).toFixed(2)} @ $
                             {(info.price / 100)} per unit
                           </StyledTableCell>
 
-                          <StyledTableCell align="right">
+                          <StyledTableCell align="center">
                             <div>
                               <select
                                 key={detail.id}
@@ -156,7 +156,7 @@ function Cart(props) {
                             </div>
                           </StyledTableCell>
 
-                          <StyledTableCell align="right">
+                          <StyledTableCell align="center">
                             <Button
                               onClick={(
                                 e,
