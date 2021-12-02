@@ -41,7 +41,7 @@ const styles = theme => ({
 function SingleFlower(props) {
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const [addedToCartMessage, setAddedToCartMessage] = useState("");
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(false);
 
   const {
     isLoggedIn,
@@ -58,16 +58,12 @@ function SingleFlower(props) {
   const token = window.localStorage.token;
   const flowerId = parseInt(match.params.id);
 
-  //BUG FIX: this had been on componentDidMount, but now that this is function the useEffect hook SHOULD in theory be doing the same thing, but i am definitely getting this running continuously. it's not impeding actual function, but it still shouldn't be happening.
-
-    useEffect(() => {
-      if (loaded === false){
-        getFlower(flowerId)
-        setLoaded(true) 
-      }
-    });
-    
-  
+  useEffect(() => {
+    if (loaded === false) {
+      getFlower(flowerId);
+      setLoaded(true);
+    }
+  });
 
   const { name, image, price, description, quantity } = flower;
 
@@ -93,16 +89,15 @@ function SingleFlower(props) {
       //uses flowerId to determine if flower is already in cart
       if (cart) {
         const orderDetail = cart.OrderDetails.filter(
-          element => (element.flowerId = flowerId)
+          element => flowerId === element.flowerId
         );
 
-        //BUG FIX: it seems like new flowers aren't adding correctly
-        console.log(orderDetail)
         //BUG FIX: if already in cart, new total should be current order quantity + selected quantity and need to set it up so we can't add more flowers than we have in stock
         if (orderDetail.length > 0) {
           updateFlowerQuantity(token, orderDetail[0].id, selectedQuantity);
           setAddedToCartMessage("Flower(s) added to cart!");
         } else {
+          console.log('we should be hitting this else statement if it is new flower' )
           addToOrder(token, cart.id, flowerId, selectedQuantity);
           setAddedToCartMessage("Flower(s) added to cart!");
         }
